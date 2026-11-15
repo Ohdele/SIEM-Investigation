@@ -142,29 +142,41 @@
 
 ## Evidence
 
-- [4625_Failed_Logons.png](Screenshots/4625_Failed_Logons.png)
+### Failed Logons — Event ID 4625
 
-  Splunk confirms repeated failed network logons against DC1 originating from the attacker host.
+![4625 Failed Logons](Screenshots/4625_Failed_Logons.png)
 
-- [4624_Success_Logons.png](Screenshots/4624_Success_Logons.png)
+Splunk confirms repeated failed network logons against DC1 originating from the attacker host.
 
-  Splunk confirms successful Administrator network logons from the attacker host to DC1.
+### Successful Logons — Event ID 4624
 
-- [Apollo_Callback_Process_Execution.png](Screenshots/Apollo_Callback_Process_Execution.png)
+![4624 Successful Logons](Screenshots/4624_Success_Logons.png)
 
-  Sysmon Event ID 1 confirms Apollo payload execution on DC1, launched by PowerShell under the Administrator account.
+Splunk confirms successful Administrator network logons from the attacker host to DC1.
 
-- [whoami-Process-Exec.png](Screenshots/whoami-Process-Exec.png)
+### Apollo Payload Execution
 
-  Sysmon Event ID 1 confirms `whoami.exe` execution on DC1 under the Administrator account, with PowerShell recorded as its parent process.
+![Apollo Callback Process Execution](Screenshots/Apollo_Callback_Process_Execution.png)
 
-- [ipconfig-System-Network-Discovery.png](Screenshots/ipconfig-System-Network-Discovery.png)
+Sysmon Event ID 1 confirms Apollo payload execution on DC1, launched by PowerShell under the Administrator account.
 
-  Sysmon Event ID 1 confirms `ipconfig.exe` execution on DC1 under the Administrator account, spawned by the Apollo process.
+### System Identity Discovery — whoami.exe
 
-- [passwords-txt-Exfiltration.png](Screenshots/passwords-txt-Exfiltration.png)
+![whoami Process Execution](Screenshots/whoami-Process-Exec.png)
 
-  Mythic Apollo Task T-3 records retrieval of the 167-byte `passwords.txt` file, confirming unauthorized data exfiltration.
+Sysmon Event ID 1 confirms `whoami.exe` execution on DC1 under the Administrator account, with PowerShell recorded as its parent process.
+
+### Network Configuration Discovery — ipconfig.exe
+
+![ipconfig System Network Discovery](Screenshots/ipconfig-System-Network-Discovery.png)
+
+Sysmon Event ID 1 confirms `ipconfig.exe` execution on DC1 under the Administrator account, spawned by the Apollo process.
+
+### File Exfiltration — passwords.txt
+
+![passwords.txt Exfiltration](Screenshots/passwords-txt-Exfiltration.png)
+
+Mythic Apollo Task T-3 records retrieval of the 167-byte `passwords.txt` file, confirming unauthorized data exfiltration.
 
 ## Operational Impact
 
