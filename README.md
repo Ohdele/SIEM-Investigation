@@ -1,4 +1,4 @@
-# I-10 · SIEM Investigation of Escalated Alerts
+# SIEM Investigation of Escalated Alerts
 
 ## Objective
 
