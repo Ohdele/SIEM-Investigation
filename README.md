@@ -2,7 +2,7 @@
 
 ## Objective
 
-Use Splunk SIEM to investigate escalated RDP brute-force and Mythic C2 alerts against DC1, correlating Windows Security logs, Sysmon telemetry and existing network evidence to reconstruct the six executed attack phases and assess incident scope and potential impact.
+Use Splunk to investigate escalated RDP brute-force and Mythic C2 alerts targeting DC1 by correlating Windows Security logs, Sysmon telemetry and existing network evidence to reconstruct the six observed attack phases and assess incident scope and potential impact.
 
 ## Investigation Details
 
@@ -10,8 +10,8 @@ Use Splunk SIEM to investigate escalated RDP brute-force and Mythic C2 alerts ag
 |---|---|
 | **Date of Report** | 15 November 2026 |
 | **Reported By** | SOC Analyst |
-| **Security Level** | High |
-| **Report Status** | Investigation completed; confirmed malicious activity |
+| **Security Level** | 🟠 High  |
+| **Report Status** | Malicious Activity Confirmed |
 | **Escalated To** | SOC Lead |
 
 ## 1. Executive Summary
@@ -20,7 +20,7 @@ Use Splunk SIEM to investigate escalated RDP brute-force and Mythic C2 alerts ag
 - **Impact:** Confirmed successful Administrator logons from Kali, Apollo payload execution, system-discovery activity, HTTP-based C2 communications and file exfiltration.
 - **Risk:** Compromise of a privileged account on the domain controller, with potential exposure of sensitive information.
 - **Status:** Investigation completed; suspicious persistence and lateral movement were not confirmed in the reviewed telemetry.
-- **Required Action:** Review the Administrator account, preserve evidence, investigate the attack infrastructure and implement appropriate containment and credential-reset measures.
+- **Required Action:** Review the Administrator account, preserve evidence, investigate the attack infrastructure and implement containment and credential-reset measures.
 
 ## 2. Findings
 
@@ -32,7 +32,7 @@ Use Splunk SIEM to investigate escalated RDP brute-force and Mythic C2 alerts ag
 - Successful sessions occurred on 7 November and 10 November 2026.
 - Logon IDs correlated successful sessions with privilege-assignment (Event ID 4672) and logoff (Event ID 4634) events.
 
-**Assessment:** Confirmed repeated authentication failures and successful Administrator network logons from Kali.
+**Assessment:** Confirmed repeated authentication failures and successful Administrator logons originating from Kali.
 
 ### Confirmed Privileged-Account Compromise and Post-Authentication Activity
 
@@ -58,7 +58,7 @@ Use Splunk SIEM to investigate escalated RDP brute-force and Mythic C2 alerts ag
 - **Data Exfiltration:** Mythic Apollo's `download` command retrieved `passwords.txt` from DC1; Mythic recorded the 167-byte file as artifact Task T-3.
 - **Additional Evidence:** Windows telemetry recorded PowerShell launching Notepad to open `passwords.txt` on 10 November at 23:52:28.
 
-**Assessment:** Confirmed endpoint discovery, Mythic C2 communications and file retrieval; no confirmed lateral movement or suspicious persistence was identified.
+**Assessment:** Confirmed endpoint discovery, Mythic C2 communications, and file exfiltration; no confirmed lateral movement or persistence was identified.
 
 ## 3. Investigation Timeline
 
@@ -68,8 +68,8 @@ Use Splunk SIEM to investigate escalated RDP brute-force and Mythic C2 alerts ag
 | 7 Nov 2026, 16:36:19 | Successful Administrator network logon from Kali. |
 | 8 Nov 2026, 21:18:38 | PowerShell launched `apollo-payload.exe` on DC1. |
 | 8 Nov 2026, 21:18:40 | Apollo initiated an outbound connection to Mythic C2 over TCP/80. |
-| 8 Nov 2026, 21:48:45 | Apollo activity resulted in execution of `whoami.exe` under `SPLUNKSOC\Administrator`; the recorded parent process was PowerShell. |
-| 8 Nov 2026, 21:49:33 | Apollo activity resulted in execution of `ipconfig.exe` under `SPLUNKSOC\Administrator`. |
+| 8 Nov 2026, 21:48:45 | PowerShell executed `whoami.exe` under `SPLUNKSOC\Administrator`. |
+| 8 Nov 2026, 21:49:33 | PowerShell executed `ipconfig.exe` under `SPLUNKSOC\Administrator`. |
 | 10 Nov 2026, 10:12:29 | Second successful Administrator network logon from Kali. |
 | 10 Nov 2026, 22:57:15 | Latest observed failed network logon from Kali. |
 | 10 Nov 2026, 22:57:17 | Third successful Administrator network logon from Kali. |
@@ -83,7 +83,7 @@ Use Splunk SIEM to investigate escalated RDP brute-force and Mythic C2 alerts ag
 | **What** | Compromise of the Administrator account and exfiltration of passwords.txt on DC1 |
 | **When** | 7–10 November 2026, based on the recorded SIEM event timestamps. |
 | **Where** | Domain controller DC1, the affected system under investigation. |
-| **Why** | To retrieve sensitive credential file (passwords.txt) |
+| **Why** | To obtain access and conduct post-compromise activity, including retrieval of passwords.txt. |
 | **How** | Through repeated network logon attempts, endpoint discovery, PowerShell-based Apollo execution and Mythic C2 establishment. |
 
 ## 5. MITRE ATT&CK Techniques
@@ -99,25 +99,20 @@ Use Splunk SIEM to investigate escalated RDP brute-force and Mythic C2 alerts ag
 
 ## 6. Recommendations & Next Steps
 
-**Immediate Containment and Evidence Preservation**
-- Review and secure the Administrator account.
-- Preserve relevant Windows Security, Sysmon and network telemetry.
-- Investigate the source and scope of the successful Administrator sessions.
+**Containment & Preservation**
+- Reset and secure the Administrator account.
+- Preserve relevant logs and telemetry.
+- Investigate successful Administrator sessions.
 
-**Persistence Review**
-- Continue monitoring service-installation and registry activity.
-- Investigate any newly identified suspicious persistence indicators.
+**Scoping & Monitoring**
+- Review DC1 authentication and process activity.
+- Assess other systems for related activity and C2 connections.
+- Monitor for persistence indicators and continued C2 communications.
 
-**Scoping**
-- Review additional authentication and process activity involving DC1.
-- Assess other systems for connections to the identified attacker infrastructure.
-- Continue monitoring for further C2 communications.
-
-**Hardening and Preventive Controls**
-- Enforce strong privileged-account authentication controls.
-- Restrict RDP access to authorized management systems.
-- Review PowerShell execution controls and endpoint monitoring.
-- Improve detection for repeated authentication failures followed by successful privileged logons.
+**Hardening**
+- Strengthen privileged-account controls.
+- Restrict RDP access.
+- Enhance PowerShell and authentication-failure detections.
 
 ## 7. Indicators of Compromise (IOCs)
 
@@ -128,8 +123,8 @@ Use Splunk SIEM to investigate escalated RDP brute-force and Mythic C2 alerts ag
 | **Hostnames** | `DC1` (`192.168.56.110`) |
 | **File names / paths** | `apollo-payload.exe, passwords.txt` |
 | **Domains / URLs** | `None identified` |
-| **Processes / services** | `powershell.exe` (PID 6280); `apollo-payload.exe` (PID 2336); `conhost.exe` (PID 6948) |
-| **Other indicators** | `TCP/80`, `Apollo Process GUID` {cbc24620-e72e-6af0-6c05-000000001d00},  `Mythic artifact Task T-3` (167 bytes) |
+| **Processes** | `powershell.exe`, `apollo-payload.exe`, `conhost.exe` |
+| **Other indicators** | `TCP/80`, `Apollo Process GUID` {cbc24620-e72e-6af0-6c05-000000001d00} |
 
 ## 8. Appendix
 
@@ -142,7 +137,7 @@ Use Splunk SIEM to investigate escalated RDP brute-force and Mythic C2 alerts ag
 - Splunk Sysmon Event ID 3 — network connections.
 - Windows Security Event ID 4688 — process creation corroboration.
 - Windows System Event ID 7045 — service installation.
-- Mythic Apollo Task T-3 — retrieved 167-byte file artifact.
+- Mythic Apollo Task T-3 — Retrieved file artifact.
 
 ## Evidence
 
@@ -184,4 +179,4 @@ Mythic Apollo Task T-3 records retrieval of the 167-byte `passwords.txt` file, c
 
 ## Operational Impact
 
-The incident demonstrated how compromised privileged access could expose sensitive information, enable unauthorized system activity, and threaten the confidentiality and integrity of business systems.
+The incident demonstrated how compromised privileged access could expose sensitive information, enable unauthorized system activity and threaten the confidentiality and integrity of business systems.
