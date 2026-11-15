@@ -1,5 +1,9 @@
 # I-10 · SIEM Investigation of Escalated Alerts
 
+## Objective
+
+Use Splunk SIEM to investigate escalated RDP brute-force and Mythic C2 alerts against DC1, correlating Windows Security logs, Sysmon telemetry and existing network evidence to reconstruct the six executed attack phases and assess incident scope and potential impact.
+
 ## Investigation Details
 
 | Field | Value |
